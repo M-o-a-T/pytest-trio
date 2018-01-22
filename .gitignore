@@ -55,3 +55,8 @@ coverage.xml
 # Django stuff:
 *.log
 *.pot
+*.pyo
+*.pyc
+*.swp
+*.swo
+/.pybuild/
