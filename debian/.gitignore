@@ -3,3 +3,4 @@
 /*.debhelper
 /*.substvars
 /python3-pytest-trio
+/debhelper-build-stamp

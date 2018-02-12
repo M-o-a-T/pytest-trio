@@ -1,3 +1,9 @@
+pytest-trio (0.3.0-2) smurf; urgency=medium
+
+  * Ignore debhelper build stamp
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Mon, 12 Feb 2018 05:47:07 +0100
+
 pytest-trio (0.3.0-1) smurf; urgency=low
 
   * source package automatically created by stdeb 0.8.5
