@@ -1,3 +1,9 @@
+pytest-trio (0.3.0-3) smurf; urgency=medium
+
+  * Merge: classifier update
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Wed, 21 Mar 2018 11:22:47 +0100
+
 pytest-trio (0.3.0-2) smurf; urgency=medium
 
   * Ignore debhelper build stamp
