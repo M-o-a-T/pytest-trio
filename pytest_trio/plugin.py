@@ -2,9 +2,9 @@
 from traceback import format_exception
 from inspect import iscoroutinefunction, isgeneratorfunction
 try:
-    from inspect import isasyncgenfunction
-except ImportError:
     from async_generator import isasyncgenfunction
+except ImportError:
+    from inspect import isasyncgenfunction
 
 import pytest
 import trio

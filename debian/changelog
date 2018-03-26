@@ -1,4 +1,4 @@
-pytest-trio (0.3.0-5) smurf; urgency=medium
+pytest-trio (0.3.0-6) smurf; urgency=medium
 
   * use async_generator's isasyncgenfunction
 
