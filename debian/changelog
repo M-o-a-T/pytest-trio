@@ -1,3 +1,9 @@
+pytest-trio (0.3.0-5) smurf; urgency=medium
+
+  * use async_generator's isasyncgenfunction
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Tue, 27 Mar 2018 00:09:56 +0200
+
 pytest-trio (0.3.0-3) smurf; urgency=medium
 
   * Merge: classifier update

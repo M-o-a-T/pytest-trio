@@ -4,10 +4,7 @@ from inspect import iscoroutinefunction, isgeneratorfunction
 try:
     from inspect import isasyncgenfunction
 except ImportError:
-    # `inspect.isasyncgenfunction` not available with Python<3.6
-    def isasyncgenfunction(x):
-        return False
-
+    from async_generator import isasyncgenfunction
 
 import pytest
 import trio
