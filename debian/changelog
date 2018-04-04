@@ -1,3 +1,9 @@
+pytest-trio (0.3.0-7) unstable; urgency=medium
+
+  * merged
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Wed, 04 Apr 2018 11:52:55 +0200
+
 pytest-trio (0.3.0-6) smurf; urgency=medium
 
   * use async_generator's isasyncgenfunction
