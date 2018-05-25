@@ -2,13 +2,15 @@ Source: pytest-trio
 Maintainer: Matthias Urlichs <matthias@urlichs.de>
 Section: python
 Priority: optional
-Build-Depends: dh-python, python3-setuptools, python3-all, debhelper (>= 9)
+Build-Depends: dh-python, python3-setuptools, python3-all, debhelper (>= 9),
+  python3-pytest
 Standards-Version: 3.9.6
 Homepage: https://github.com/python-trio/pytest-trio
 
 Package: python3-pytest-trio
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}
+Depends: ${misc:Depends}, ${python3:Depends},
+  python3-pytest
 Description: Pytest plugin for trio
  pytest-trio
  ===========
