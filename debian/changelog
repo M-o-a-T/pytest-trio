@@ -1,3 +1,9 @@
+pytest-trio (0.4.1-3) unstable; urgency=medium
+
+  * Fix tests, needs the egg-info directory
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Tue, 29 May 2018 13:30:45 +0200
+
 pytest-trio (0.4.1-2) unstable; urgency=medium
 
   * Fix tests, require pytest >3.3
