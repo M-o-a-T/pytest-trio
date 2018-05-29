@@ -1,15 +1,19 @@
 """pytest-trio implementation."""
+import sys
 from traceback import format_exception
 from inspect import iscoroutinefunction, isgeneratorfunction
-try:
-    from async_generator import isasyncgenfunction
-except ImportError:
-    from inspect import isasyncgenfunction
-
 import pytest
 import trio
 from trio.testing import MockClock, trio_test
-from async_generator import async_generator, yield_, asynccontextmanager
+from async_generator import (
+    async_generator, yield_, asynccontextmanager, isasyncgenfunction
+)
+
+if sys.version_info >= (3, 6):
+    ORDERED_DICTS = True
+else:
+    # Ordered dict (and **kwargs) not available with Python<3.6
+    ORDERED_DICTS = False
 
 
 def pytest_configure(config):
@@ -65,6 +69,9 @@ async def _setup_async_fixtures_in(deps):
     need_resolved_deps_stack = [
         (k, v) for k, v in deps.items() if isinstance(v, BaseAsyncFixture)
     ]
+    if not ORDERED_DICTS:
+        # Make the fixture resolution order determinist
+        need_resolved_deps_stack = sorted(need_resolved_deps_stack)
 
     if not need_resolved_deps_stack:
         await yield_(deps)
@@ -130,14 +137,15 @@ class AsyncYieldFixture(BaseAsyncFixture):
         __tracebackhide__ = True
         agen = self.fixturedef.func(**resolved_deps)
 
-        await yield_(await agen.asend(None))
-
         try:
-            await agen.asend(None)
-        except StopAsyncIteration:
-            pass
-        else:
-            raise RuntimeError('Only one yield in fixture is allowed')
+            await yield_(await agen.asend(None))
+        finally:
+            try:
+                await agen.asend(None)
+            except StopAsyncIteration:
+                pass
+            else:
+                raise RuntimeError('Only one yield in fixture is allowed')
 
 
 class SyncFixtureWithAsyncDeps(BaseAsyncFixture):
@@ -163,14 +171,15 @@ class SyncYieldFixtureWithAsyncDeps(BaseAsyncFixture):
         __tracebackhide__ = True
         gen = self.fixturedef.func(**resolved_deps)
 
-        await yield_(gen.send(None))
-
         try:
-            gen.send(None)
-        except StopIteration:
-            pass
-        else:
-            raise RuntimeError('Only one yield in fixture is allowed')
+            await yield_(gen.send(None))
+        finally:
+            try:
+                gen.send(None)
+            except StopIteration:
+                pass
+            else:
+                raise RuntimeError('Only one yield in fixture is allowed')
 
 
 class AsyncFixture(BaseAsyncFixture):
