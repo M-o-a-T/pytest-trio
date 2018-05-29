@@ -1,3 +1,9 @@
+pytest-trio (0.4.1-2) unstable; urgency=medium
+
+  * Fix tests, require pytest >3.3
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Tue, 29 May 2018 12:44:27 +0200
+
 pytest-trio (0.4.1-1) unstable; urgency=medium
 
   * Merge to 0.4.1

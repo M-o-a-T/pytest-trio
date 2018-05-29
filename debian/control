@@ -3,7 +3,8 @@ Maintainer: Matthias Urlichs <matthias@urlichs.de>
 Section: python
 Priority: optional
 Build-Depends: dh-python, python3-setuptools, python3-all, debhelper (>= 9),
-  python3-pytest
+  python3-pytest (>= 3.3),
+  python3-async-generator,
 Standards-Version: 3.9.6
 Homepage: https://github.com/python-trio/pytest-trio
 
@@ -12,22 +13,8 @@ Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends},
   python3-pytest
 Description: Pytest plugin for trio
- pytest-trio
- ===========
+ This plugin affords the "@pytest.mark.trio" decorator which you can use to automagically
+ execute async testcases in a Trio context.
  .
- .. image:: https://travis-ci.org/python-trio/pytest-trio.svg?branch=master
-     :target: https://travis-ci.org/python-trio/pytest-trio
- .
- .. image:: https://ci.appveyor.com/api/projects/status/aq0pklx7hanx031x?svg=true
-     :target: https://ci.appveyor.com/project/touilleMan/pytest-trio
- .
- .. image:: https://codecov.io/gh/python-trio/pytest-trio/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/python-trio/pytest-trio
- .
- Welcome to `pytest-trio <https://github.com/python-trio/pytest-trio>`__!
- .
- Pytest plugin for trio
- .
- License: Your choice of MIT or Apache License 2.0
- .
+ Async generators as fixtures are also supported.
 
