@@ -13,8 +13,8 @@ Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends},
   python3-pytest
 Description: Pytest plugin for trio
- This plugin affords the "@pytest.mark.trio" decorator which you can use to automagically
- execute async testcases in a Trio context.
+ This plugin affords the "@pytest.mark.trio" decorator which you can use
+ to execute async testcases in a Trio context.
  .
- Async generators as fixtures are also supported.
+ Using async generators as fixtures is also supported.
 

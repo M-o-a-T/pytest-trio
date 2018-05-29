@@ -1,3 +1,11 @@
+pytest-trio (0.4.1-4) unstable; urgency=medium
+
+  * Fix Lintian errors:
+    + Add copyright file
+    + fix description
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Tue, 29 May 2018 13:33:36 +0200
+
 pytest-trio (0.4.1-3) unstable; urgency=medium
 
   * Fix tests, needs the egg-info directory
