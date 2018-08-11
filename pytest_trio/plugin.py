@@ -9,6 +9,10 @@ from async_generator import (
     async_generator, yield_, asynccontextmanager, isasyncgenfunction
 )
 
+################################################################
+# Basic setup
+################################################################
+
 if sys.version_info >= (3, 6):
     ORDERED_DICTS = True
 else:
@@ -16,8 +20,17 @@ else:
     ORDERED_DICTS = False
 
 
+def pytest_addoption(parser):
+    parser.addini(
+        "trio_mode",
+        "should pytest-trio handle all async functions?",
+        type="bool",
+        default=False,
+    )
+
+
 def pytest_configure(config):
-    """Inject documentation."""
+    # So that it shows up in 'pytest --markers' output:
     config.addinivalue_line(
         "markers", "trio: "
         "mark the test as an async trio test; "
@@ -25,8 +38,30 @@ def pytest_configure(config):
     )
 
 
-def _trio_test_runner_factory(item):
-    testfunc = item.function
+@pytest.hookimpl(tryfirst=True)
+def pytest_exception_interact(node, call, report):
+    if issubclass(call.excinfo.type, trio.MultiError):
+        # TODO: not really elegant (pytest cannot output color with this hack)
+        report.longrepr = ''.join(format_exception(*call.excinfo._excinfo))
+
+
+################################################################
+# Core support for running tests and constructing fixtures
+################################################################
+
+
+def _trio_test_runner_factory(item, testfunc=None):
+    testfunc = testfunc or item.function
+
+    if getattr(testfunc, '_trio_test_runner_wrapped', False):
+        # We have already wrapped this, perhaps because we combined Hypothesis
+        # with pytest.mark.parametrize
+        return testfunc
+
+    if not iscoroutinefunction(testfunc):
+        pytest.fail(
+            'test function `%r` is marked trio but is not async' % item
+        )
 
     @trio_test
     async def _bootstrap_fixture_and_run_test(**kwargs):
@@ -41,7 +76,8 @@ def _trio_test_runner_factory(item):
                         await testfunc(**resolved_kwargs)
                     except BaseException as exc:
                         # Regular pytest fixture don't have access to the test
-                        # exception in there teardown, we mimic this behavior here.
+                        # exception in there teardown, we mimic this behavior
+                        # here.
                         user_exc = exc
             except BaseException as exc:
                 # If we are here, the exception comes from the fixtures setup
@@ -51,13 +87,16 @@ def _trio_test_runner_factory(item):
                 else:
                     raise exc
             finally:
-                # No matter what the nursery fixture should be closed when test is over
+                # No matter what the nursery fixture should be closed when
+                # test is over
                 nursery.cancel_scope.cancel()
 
-        # Finally re-raise or original exception coming from the test if needed
+        # Finally re-raise or original exception coming from the test if
+        # needed
         if user_exc:
             raise user_exc
 
+    _bootstrap_fixture_and_run_test._trio_test_runner_wrapped = True
     return _bootstrap_fixture_and_run_test
 
 
@@ -86,16 +125,14 @@ async def _setup_async_fixtures_in(deps):
             if not deps_stack:
                 await yield_([(name, resolved)])
             else:
-                async with _recursive_setup(
-                    deps_stack
-                ) as remains_deps_stack_resolved:
+                async with _recursive_setup(deps_stack
+                                            ) as remains_deps_stack_resolved:
                     await yield_(
                         remains_deps_stack_resolved + [(name, resolved)]
                     )
 
-    async with _recursive_setup(
-        need_resolved_deps_stack
-    ) as resolved_deps_stack:
+    async with _recursive_setup(need_resolved_deps_stack
+                                ) as resolved_deps_stack:
         await yield_({**deps, **dict(resolved_deps_stack)})
 
 
@@ -201,8 +238,7 @@ def _install_async_fixture_if_needed(fixturedef, request):
         asyncfix = AsyncFixture(fixturedef, deps)
     elif isasyncgenfunction(fixturedef.func):
         asyncfix = AsyncYieldFixture(fixturedef, deps)
-    elif any(dep for dep in deps.values()
-             if isinstance(dep, BaseAsyncFixture)):
+    elif any(isinstance(dep, BaseAsyncFixture) for dep in deps.values()):
         if isgeneratorfunction(fixturedef.func):
             asyncfix = SyncYieldFixtureWithAsyncDeps(fixturedef, deps)
         else:
@@ -215,11 +251,18 @@ def _install_async_fixture_if_needed(fixturedef, request):
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item):
     if 'trio' in item.keywords:
-        if not iscoroutinefunction(item.obj):
-            pytest.fail(
-                'test function `%r` is marked trio but is not async' % item
+        if hasattr(item.obj, 'hypothesis'):
+            # If it's a Hypothesis test, we go in a layer.
+            item.obj.hypothesis.inner_test = _trio_test_runner_factory(
+                item, item.obj.hypothesis.inner_test
             )
-        item.obj = _trio_test_runner_factory(item)
+        elif getattr(item.obj, 'is_hypothesis_test', False):
+            pytest.fail(
+                'test function `%r` is using Hypothesis, but pytest-trio '
+                'only works with Hypothesis 3.64.0 or later.' % item
+            )
+        else:
+            item.obj = _trio_test_runner_factory(item)
 
     yield
 
@@ -230,11 +273,29 @@ def pytest_fixture_setup(fixturedef, request):
         return _install_async_fixture_if_needed(fixturedef, request)
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_exception_interact(node, call, report):
-    if issubclass(call.excinfo.type, trio.MultiError):
-        # TODO: not really elegant (pytest cannot output color with this hack)
-        report.longrepr = ''.join(format_exception(*call.excinfo._excinfo))
+################################################################
+# Trio mode
+################################################################
+
+
+def automark(items):
+    for item in items:
+        if hasattr(item.obj, "hypothesis"):
+            test_func = item.obj.hypothesis.inner_test
+        else:
+            test_func = item.obj
+        if iscoroutinefunction(test_func):
+            item.add_marker(pytest.mark.trio)
+
+
+def pytest_collection_modifyitems(config, items):
+    if config.getini("trio_mode"):
+        automark(items)
+
+
+################################################################
+# Built-in fixtures
+################################################################
 
 
 @pytest.fixture
