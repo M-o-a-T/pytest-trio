@@ -1,3 +1,9 @@
+pytest-trio (0.4.2-4) unstable; urgency=medium
+
+  * and another
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Wed, 29 Aug 2018 17:44:45 +0200
+
 pytest-trio (0.4.2-3) unstable; urgency=medium
 
   * skip hypothesis tests if unavailable

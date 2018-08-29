@@ -1,8 +1,13 @@
 import pytest
+try:
+    from hypothesis import given, settings, strategies
+except ImportError:
+    pass
+else:
 
-from .helpers import enable_trio_mode
+    from .helpers import enable_trio_mode
 
-test_text = """
+    test_text = """
 import pytest
 import trio
 from hypothesis import given, settings, strategies
@@ -28,11 +33,11 @@ async def test_hypothesis_fail(b):
 """
 
 
-@enable_trio_mode
-def test_trio_mode(testdir, enable_trio_mode):
-    enable_trio_mode(testdir)
+    @enable_trio_mode
+    def test_trio_mode(testdir, enable_trio_mode):
+        enable_trio_mode(testdir)
 
-    testdir.makepyfile(test_text)
+        testdir.makepyfile(test_text)
 
-    result = testdir.runpytest()
-    result.assert_outcomes(passed=2, failed=2)
+        result = testdir.runpytest()
+        result.assert_outcomes(passed=2, failed=2)
