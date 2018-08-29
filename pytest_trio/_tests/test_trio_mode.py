@@ -14,13 +14,13 @@ async def test_fail():
     await trio.sleep(0)
     assert False
 
-@settings(deadline=None, max_examples=5)
+@settings(max_examples=5)
 @given(strategies.binary())
 async def test_hypothesis_pass(b):
     await trio.sleep(0)
     assert isinstance(b, bytes)
 
-@settings(deadline=None, max_examples=5)
+@settings(max_examples=5)
 @given(strategies.binary())
 async def test_hypothesis_fail(b):
     await trio.sleep(0)
