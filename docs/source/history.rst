@@ -5,12 +5,22 @@ Release history
 
 .. towncrier release notes start
 
-pytest-trio 0.5.0 (????-??-??)
+pytest-trio 0.5.1 (2018-09-28)
+------------------------------
+
+Bugfixes
+~~~~~~~~
+
+- The pytest 3.8.1 release broke pytest-trio's handling of trio tests
+  defined as class methods. We fixed it again. (`#64 <https://github.com/python-trio/pytest-trio/issues/64>`__)
+
+
+pytest-trio 0.5.0 (2018-08-26)
 ------------------------------
 
 This is a major release, including a rewrite of large portions of the
 internals. We believe it should be backwards compatible with existing
-projects, but major new features include:
+projects. Major new features include:
 
 * "trio mode": no more writing ``@pytest.mark.trio`` everywhere!
 * it's now safe to use nurseries inside fixtures (`#55
