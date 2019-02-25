@@ -1,8 +1,8 @@
-pytest-trio (0.5.2-2) UNRELEASED; urgency=medium
+pytest-trio (0.5.2-3) unstable; urgency=medium
 
-  * ignore
+  * Require trio 0.11
 
- -- Matthias Urlichs <matthias@urlichs.de>  Mon, 25 Feb 2019 12:26:02 +0100
+ -- Matthias Urlichs <matthias@urlichs.de>  Mon, 25 Feb 2019 12:29:19 +0100
 
 pytest-trio (0.5.2-1) unstable; urgency=medium
 
